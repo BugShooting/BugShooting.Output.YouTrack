@@ -159,7 +159,7 @@ namespace BS.Output.YouTrack
           List<Project> projects = await YouTrackProxy.GetAccessibleProjects(Output.Url, loginResult.LoginCookies);
 
           // Show send window
-          Send send = new Send(Output.Url, Output.LastProjectID, Output.LastIssueID, projects, userName, password, fileName);
+          Send send = new Send(Output.Url, Output.LastProjectID, Output.LastIssueID, projects, fileName);
 
           var sendOwnerHelper = new System.Windows.Interop.WindowInteropHelper(send);
           sendOwnerHelper.Owner = Owner.Handle;

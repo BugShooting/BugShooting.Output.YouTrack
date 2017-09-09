@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Text.RegularExpressions;
 
 namespace BS.Output.YouTrack
 {
   partial class Send : Window
   {
 
-    public Send(string url, string lastProjectID, string lastIssueID, List<Project> projects, string userName, string password, string fileName)
+    public Send(string url, string lastProjectID, string lastIssueID, List<Project> projects, string fileName)
     {
       InitializeComponent();
 
