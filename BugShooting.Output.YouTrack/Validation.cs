@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace BS.Output.YouTrack
+namespace BugShooting.Output.YouTrack
 {
   class Validation
   {

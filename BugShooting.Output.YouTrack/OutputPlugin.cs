@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BS.Plugin.V3.Output;
+using BS.Plugin.V3.Common;
+using BS.Plugin.V3.Utilities;
 
-namespace BS.Output.YouTrack
+namespace BugShooting.Output.YouTrack
 {
-  public class OutputAddIn: V3.OutputAddIn<Output>
+  public class OutputPlugin: OutputPlugin<Output>
   {
 
     protected override string Name
@@ -78,41 +81,41 @@ namespace BS.Output.YouTrack
 
     }
 
-    protected override OutputValueCollection SerializeOutput(Output Output)
+    protected override OutputValues SerializeOutput(Output Output)
     {
 
-      OutputValueCollection outputValues = new OutputValueCollection();
+      OutputValues outputValues = new OutputValues();
 
-      outputValues.Add(new OutputValue("Name", Output.Name));
-      outputValues.Add(new OutputValue("Url", Output.Url));
-      outputValues.Add(new OutputValue("UserName", Output.UserName));
-      outputValues.Add(new OutputValue("Password",Output.Password, true));
-      outputValues.Add(new OutputValue("OpenItemInBrowser", Convert.ToString(Output.OpenItemInBrowser)));
-      outputValues.Add(new OutputValue("FileName", Output.FileName));
-      outputValues.Add(new OutputValue("FileFormat", Output.FileFormat));
-      outputValues.Add(new OutputValue("LastProjectID", Output.LastProjectID));
-      outputValues.Add(new OutputValue("LastIssueID", Output.LastIssueID));
+      outputValues.Add("Name", Output.Name);
+      outputValues.Add("Url", Output.Url);
+      outputValues.Add("UserName", Output.UserName);
+      outputValues.Add("Password",Output.Password, true);
+      outputValues.Add("OpenItemInBrowser", Convert.ToString(Output.OpenItemInBrowser));
+      outputValues.Add("FileName", Output.FileName);
+      outputValues.Add("FileFormat", Output.FileFormat);
+      outputValues.Add("LastProjectID", Output.LastProjectID);
+      outputValues.Add("LastIssueID", Output.LastIssueID);
 
       return outputValues;
       
     }
 
-    protected override Output DeserializeOutput(OutputValueCollection OutputValues)
+    protected override Output DeserializeOutput(OutputValues OutputValues)
     {
 
-      return new Output(OutputValues["Name", this.Name].Value,
-                        OutputValues["Url", ""].Value, 
-                        OutputValues["UserName", ""].Value,
-                        OutputValues["Password", ""].Value, 
-                        OutputValues["FileName", "Screenshot"].Value, 
-                        OutputValues["FileFormat", ""].Value,
-                        Convert.ToBoolean(OutputValues["OpenItemInBrowser", Convert.ToString(true)].Value),
-                        OutputValues["LastProjectID", string.Empty].Value, 
-                        OutputValues["LastIssueID", string.Empty].Value);
+      return new Output(OutputValues["Name", this.Name],
+                        OutputValues["Url", ""], 
+                        OutputValues["UserName", ""],
+                        OutputValues["Password", ""], 
+                        OutputValues["FileName", "Screenshot"], 
+                        OutputValues["FileFormat", ""],
+                        Convert.ToBoolean(OutputValues["OpenItemInBrowser", Convert.ToString(true)]),
+                        OutputValues["LastProjectID", string.Empty], 
+                        OutputValues["LastIssueID", string.Empty]);
 
     }
 
-    protected override async Task<V3.SendResult> Send(IWin32Window Owner, Output Output, V3.ImageData ImageData)
+    protected override async Task<SendResult> Send(IWin32Window Owner, Output Output, ImageData ImageData)
     {
 
       try
@@ -123,7 +126,7 @@ namespace BS.Output.YouTrack
         bool showLogin = string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password);
         bool rememberCredentials = false;
 
-        string fileName = V3.FileHelper.GetFileName(Output.FileName, Output.FileFormat, ImageData);
+        string fileName = AttributeHelper.ReplaceAttributes(Output.FileName, ImageData);
 
         while (true)
         {
@@ -139,7 +142,7 @@ namespace BS.Output.YouTrack
 
             if (credentials.ShowDialog() != true)
             {
-              return new V3.SendResult(V3.Result.Canceled);
+              return new SendResult(Result.Canceled);
             }
 
             userName = credentials.UserName;
@@ -166,7 +169,7 @@ namespace BS.Output.YouTrack
 
           if (!send.ShowDialog() == true)
           {
-            return new V3.SendResult(V3.Result.Canceled);
+            return new SendResult(Result.Canceled);
           }
 
           string projectID = null;
@@ -180,7 +183,7 @@ namespace BS.Output.YouTrack
             CreateIssueResult createIssueResult = await YouTrackProxy.CreateIssue(Output.Url, loginResult.LoginCookies, projectID, send.Summary, send.Description);
             if (!createIssueResult.Success)
             {
-              return new V3.SendResult(V3.Result.Failed, createIssueResult.FaultMessage);
+              return new SendResult(Result.Failed, createIssueResult.FaultMessage);
             }
 
             issueID = createIssueResult.IssueID;
@@ -192,40 +195,40 @@ namespace BS.Output.YouTrack
             projectID = Output.LastProjectID;
           }
 
-          string fullFileName = String.Format("{0}.{1}", send.FileName, V3.FileHelper.GetFileExtention(Output.FileFormat));
-          string fileMimeType = V3.FileHelper.GetMimeType(Output.FileFormat);
-          byte[] fileBytes = V3.FileHelper.GetFileBytes(Output.FileFormat, ImageData);
+          string fullFileName = String.Format("{0}.{1}", send.FileName, FileHelper.GetFileExtention(Output.FileFormat));
+          string fileMimeType = FileHelper.GetMimeType(Output.FileFormat);
+          byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormat, ImageData);
 
           AddAttachmentResult addAttachmentResult = await YouTrackProxy.AddAttachment(Output.Url, loginResult.LoginCookies, issueID, fullFileName, fileBytes, fileMimeType);
           if (!addAttachmentResult.Success)
           {
-            return new V3.SendResult(V3.Result.Failed, addAttachmentResult.FaultMessage);
+            return new SendResult(Result.Failed, addAttachmentResult.FaultMessage);
           }
 
           // Open issue in browser
           if (Output.OpenItemInBrowser)
           {
-            V3.WebHelper.OpenUrl(String.Format("{0}/issue/{1}", Output.Url, issueID));
+            WebHelper.OpenUrl(String.Format("{0}/issue/{1}", Output.Url, issueID));
           }
 
 
-          return new V3.SendResult(V3.Result.Success,
-                                    new Output(Output.Name,
-                                               Output.Url,
-                                               (rememberCredentials) ? userName : Output.UserName,
-                                               (rememberCredentials) ? password : Output.Password,
-                                               Output.FileName,
-                                               Output.FileFormat,
-                                               Output.OpenItemInBrowser,
-                                               projectID,
-                                               issueID));
+          return new SendResult(Result.Success,
+                                new Output(Output.Name,
+                                           Output.Url,
+                                           (rememberCredentials) ? userName : Output.UserName,
+                                           (rememberCredentials) ? password : Output.Password,
+                                           Output.FileName,
+                                           Output.FileFormat,
+                                           Output.OpenItemInBrowser,
+                                           projectID,
+                                           issueID));
             
         }
 
       }
       catch (Exception ex)
       {
-        return new V3.SendResult(V3.Result.Failed, ex.Message);
+        return new SendResult(Result.Failed, ex.Message);
       }
 
     }

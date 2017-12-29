@@ -1,4 +1,6 @@
-﻿namespace BS.Output.YouTrack
+﻿using BS.Plugin.V3.Output;
+
+namespace BugShooting.Output.YouTrack
 {
 
   public class Output: IOutput 

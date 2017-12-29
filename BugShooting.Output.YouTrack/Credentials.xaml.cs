@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace BS.Output.YouTrack
+namespace BugShooting.Output.YouTrack
 {
   partial class Credentials : Window
   {

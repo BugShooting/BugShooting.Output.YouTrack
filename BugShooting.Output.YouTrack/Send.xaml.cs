@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace BS.Output.YouTrack
+namespace BugShooting.Output.YouTrack
 {
   partial class Send : Window
   {

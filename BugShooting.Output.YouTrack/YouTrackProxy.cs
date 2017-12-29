@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 
-namespace BS.Output.YouTrack
+namespace BugShooting.Output.YouTrack
 {
   internal class YouTrackProxy
   {

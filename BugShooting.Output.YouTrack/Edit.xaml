@@ -1,53 +1,49 @@
-﻿<Window x:Class="BS.Output.YouTrack.Send"
+﻿<Window x:Class="BugShooting.Output.YouTrack.Edit"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-        xmlns:local="clr-namespace:BS.Output.YouTrack"
+        xmlns:local="clr-namespace:BugShooting.Output.YouTrack"
         x:ClassModifier="internal"
         mc:Ignorable="d" 
-        Title="Send"
+        Title="YouTrack"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Width="300"
+        Width="400"
         SizeToContent="Height">
 
   <StackPanel Grid.IsSharedSizeScope="True" Margin="4">
-    <TextBlock x:Name="Url" Margin="4" TextWrapping="Wrap" />
-    <Separator Margin="4" />
-    <RadioButton x:Name="NewIssue" Content="New issue" Margin="4" Checked="NewIssue_CheckedChanged" Unchecked="NewIssue_CheckedChanged" />
-    <RadioButton x:Name="AttachToIssue" Content="Attach to issue" Margin="4" />
-    <Grid x:Name="ProjectControls" Margin="4">
+    <Grid Margin="4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Label Grid.Column="0">Project</Label>
-      <ComboBox x:Name="ProjectComboBox" Grid.Column="1" SelectedValuePath="ID" DisplayMemberPath="Name" local:Validation.Required="True" />
+      <Label Grid.Column="0">Name</Label>
+      <TextBox x:Name="NameTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
     </Grid>
-    <Grid x:Name="SummaryControls" Margin="4">
+    <Grid Margin="4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Label Grid.Column="0">Summary</Label>
-      <TextBox x:Name="SummaryTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
+      <Label Grid.Column="0">Url</Label>
+      <TextBox x:Name="UrlTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
     </Grid>
-    <Grid x:Name="DescriptionControls" Margin="4">
+    <Grid Margin="4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Label Grid.Column="0">Description</Label>
-      <TextBox x:Name="DescriptionTextBox" Grid.Column="1" VerticalContentAlignment="Center" MaxLines="5" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" local:Validation.Required="True" />
+      <Label Grid.Column="0">User</Label>
+      <TextBox x:Name="UserNameTextBox" Grid.Column="1" VerticalContentAlignment="Center" />
     </Grid>
-    <Grid x:Name="IssueIDControls" Margin="4">
+    <Grid Margin="4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Label Grid.Column="0">Issue ID</Label>
-      <TextBox x:Name="IssueIDTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
+      <Label Grid.Column="0">Password</Label>
+      <PasswordBox x:Name="PasswordBox" Grid.Column="1" VerticalContentAlignment="Center" />
     </Grid>
     <Grid Margin="4">
       <Grid.ColumnDefinitions>
@@ -55,7 +51,20 @@
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Label Grid.Column="0">File name</Label>
-      <TextBox x:Name="FileNameTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
+      <TextBox x:Name="FileNameTextBox" Grid.Column="1" VerticalContentAlignment="Center" Margin="0,0,94,0" ContextMenuService.IsEnabled="False" />
+      <Button x:Name="FileNameReplacement"  Grid.Column="1" Content="%" Width="25" HorizontalAlignment="Right" Margin="0,0,68,0" Click="FileNameReplacement_Click">
+        <Button.ContextMenu>
+          <ContextMenu x:Name="FileNameReplacementList" />
+        </Button.ContextMenu>
+      </Button>
+      <ComboBox x:Name="FileFormatComboBox" Grid.Column="1" Width="60" HorizontalAlignment="Right" SelectedValuePath="Tag" local:Validation.Required="True" />
+    </Grid>
+    <Grid Margin="4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <CheckBox x:Name="OpenItemInBrowserCheckBox" Grid.Column="1" Content="Open item in browser after sending" />
     </Grid>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0" >
       <Button x:Name="OK" Width="80" Height="24" Content="OK" Margin="4" IsDefault="True" Click="OK_Click" />
