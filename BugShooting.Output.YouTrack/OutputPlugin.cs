@@ -1,11 +1,12 @@
-﻿using System;
+﻿using BS.Plugin.V3.Common;
+using BS.Plugin.V3.Output;
+using BS.Plugin.V3.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BS.Plugin.V3.Output;
-using BS.Plugin.V3.Common;
-using BS.Plugin.V3.Utilities;
 
 namespace BugShooting.Output.YouTrack
 {
@@ -45,7 +46,7 @@ namespace BugShooting.Output.YouTrack
                                  String.Empty, 
                                  String.Empty, 
                                  "Screenshot",
-                                 String.Empty, 
+                                 FileHelper.GetFileFormats().First().ID,
                                  true,
                                  String.Empty,
                                  String.Empty);
@@ -69,7 +70,7 @@ namespace BugShooting.Output.YouTrack
                           edit.UserName,
                           edit.Password,
                           edit.FileName,
-                          edit.FileFormat,
+                          edit.FileFormatID,
                           edit.OpenItemInBrowser,
                           Output.LastProjectID,
                           Output.LastIssueID);
@@ -92,7 +93,7 @@ namespace BugShooting.Output.YouTrack
       outputValues.Add("Password",Output.Password, true);
       outputValues.Add("OpenItemInBrowser", Convert.ToString(Output.OpenItemInBrowser));
       outputValues.Add("FileName", Output.FileName);
-      outputValues.Add("FileFormat", Output.FileFormat);
+      outputValues.Add("FileFormatID", Output.FileFormatID.ToString());
       outputValues.Add("LastProjectID", Output.LastProjectID);
       outputValues.Add("LastIssueID", Output.LastIssueID);
 
@@ -107,8 +108,8 @@ namespace BugShooting.Output.YouTrack
                         OutputValues["Url", ""], 
                         OutputValues["UserName", ""],
                         OutputValues["Password", ""], 
-                        OutputValues["FileName", "Screenshot"], 
-                        OutputValues["FileFormat", ""],
+                        OutputValues["FileName", "Screenshot"],
+                        new Guid(OutputValues["FileFormatID", ""]),
                         Convert.ToBoolean(OutputValues["OpenItemInBrowser", Convert.ToString(true)]),
                         OutputValues["LastProjectID", string.Empty], 
                         OutputValues["LastIssueID", string.Empty]);
@@ -195,11 +196,13 @@ namespace BugShooting.Output.YouTrack
             projectID = Output.LastProjectID;
           }
 
-          string fullFileName = String.Format("{0}.{1}", send.FileName, FileHelper.GetFileExtension(Output.FileFormat));
-          string fileMimeType = FileHelper.GetMimeType(Output.FileFormat);
-          byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormat, ImageData);
+          IFileFormat fileFormat = FileHelper.GetFileFormat(Output.FileFormatID);
 
-          AddAttachmentResult addAttachmentResult = await YouTrackProxy.AddAttachment(Output.Url, loginResult.LoginCookies, issueID, fullFileName, fileBytes, fileMimeType);
+          string fullFileName = String.Format("{0}.{1}", send.FileName, fileFormat.FileExtension);
+
+          byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormatID, ImageData);
+
+          AddAttachmentResult addAttachmentResult = await YouTrackProxy.AddAttachment(Output.Url, loginResult.LoginCookies, issueID, fullFileName, fileBytes, fileFormat.MimeType);
           if (!addAttachmentResult.Success)
           {
             return new SendResult(Result.Failed, addAttachmentResult.FaultMessage);
@@ -218,7 +221,7 @@ namespace BugShooting.Output.YouTrack
                                            (rememberCredentials) ? userName : Output.UserName,
                                            (rememberCredentials) ? password : Output.Password,
                                            Output.FileName,
-                                           Output.FileFormat,
+                                           Output.FileFormatID,
                                            Output.OpenItemInBrowser,
                                            projectID,
                                            issueID));
